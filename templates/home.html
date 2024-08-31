@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    </head>
+
+
+    <body onload="loadClasses()">
+
+        <button onclick="addClassClicked()" id="addClassButton">Add a Class</button>
+        <div id="classAdder" hidden="true">
+            <input type="text" id="classBeingAdded">
+            <button onclick="classAdded()">Submit</button>
+        </div>
+
+        <br><br><br><br>
+        <div id="currentClasses">
+
+        </div>
+
+
+        <script>
+            function loadClasses() {
+                $.ajax({
+                        url: '/Classes',
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function(response) {
+                            response = JSON.parse(response)
+                            console.log(response)
+                            for (let course of response) {
+                                let classesDiv = document.getElementById("currentClasses")
+                                let button = document.createElement("button")
+                                button.innerHTML = course
+                                button.onclick = () => {
+                                   $.ajax({
+                                        url: '/home/classes',
+                                        type: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify(course),
+                                        success: function(response) {
+                                            response = JSON.parse(response)
+                                            console.log(response)
+                                            window.location = '/class/' + response
+                                        },
+                                        error: function(error) {
+                                            console.log(error);
+                                        }
+                                    });
+                                }
+                                classesDiv.appendChild(button)
+                            }
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+            }
+
+            function addClassClicked() {
+                document.getElementById("classAdder").hidden = false
+                document.getElementById("addClassButton").hidden = true
+            }
+
+            function classAdded() {
+                document.getElementById("classAdder").hidden = true
+                document.getElementById("addClassButton").hidden = false
+                let className = document.getElementById("classBeingAdded").value
+                $.ajax({
+                        url: '/Classes',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(className),
+                        success: function(response) {
+                            response = JSON.parse(response)
+                            console.log(response)
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+                window.location.reload()
+                }
+
+        </script>
+
+
+    </body>
+
+</html>

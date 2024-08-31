@@ -1,0 +1,152 @@
+<!doctype html>
+
+<html>
+
+    <head>
+        <title>Workout Log</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+            }
+            body{
+                background: linear-gradient(to top, #484647 0%, #666699 100%);
+                margin: 0px;
+            }
+
+            #loginPanel{
+                border-style: solid;
+                border-radius: 20px;
+                padding: 40px;
+                border-width: 1px;
+                width: 350px;
+                margin-left: auto;
+                margin-right: auto;
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(50%);
+                border-color: white;
+                font-family: "Arial Rounded MT Bold", sans-serif;
+                text-align: center;
+                box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+            }
+
+            #loginButton{
+                font-family: sans-serif;
+                background-color: transparent;
+                border-style: solid;
+                border-radius: 20px;
+                padding: 8px;
+                border-width: 1px;
+                border-color: whitesmoke;
+                width: 200px;
+                background: linear-gradient(to right, #ccccff 0%, #666699 100%);
+                font-size: 18px;
+            }
+            #loginButton:hover {
+                background: transparent; /* Change background to transparent on hover */
+                color: whitesmoke;
+            }
+
+            #loginText{
+                font-family: sans-serif;
+                font-size: 40px;
+                text-align: center;
+                color: whitesmoke;
+                padding: 18px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+
+            .textbox{
+                font-size: 15px;
+                border-radius: 20px;
+                border-style: solid;
+                border-width: 1px;
+                padding: 8px;
+                border-color: whitesmoke;
+                background-color: transparent;
+                width: 200px;
+                font-family: "Arial Rounded MT Bold";
+                color: cornflowerblue;
+            }
+            ::placeholder {
+                    color: cornflowerblue;
+                    font-family: "Arial Rounded MT Bold";
+                }
+            box-icon {
+                position: absolute;
+                transform: translate(-30px, 7.5px);
+                block-size: 18px;
+            }
+            .textbox:focus + box-icon {
+                block-size: 21px;
+            }
+            .textbox:focus::placeholder {
+                visibility: hidden;
+            }
+            h2 {
+                margin-top: auto;
+                font-family: sans-serif;
+                font-size: 40px;
+                margin-left: auto;
+                margin-right: auto;
+                color: black;
+                border-bottom-style: solid;
+                width: 150px;
+                padding: 15px;
+            }
+            a {
+                color: #666699;
+                position: relative;
+                top: -11px;
+            }
+            #userIcon {
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 5px;
+                block-size: 20px;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+
+    <h1 id="loginText">Welcome Back!</h1>
+    <br> <br>
+    <div id="loginPanel">
+        <form action="/" method="post">
+            <label id="loginLabel">
+                <h2>Log in</h2>
+
+                <input type="text" name="username" id="username" class="textbox" placeholder="Username">
+                <box-icon name='user' color='#6495ed' ></box-icon>
+                <br> <br>
+                <input type="password" name="password" id="password" class="textbox" placeholder="Password">
+                <box-icon name='lock-open-alt' color="#6495ed"></box-icon>
+                <br>
+                <a href="/register" style="position: relative; top: 5px; left: -40px; font-size: 13.5px">Forgot Password?</a>
+                <br> <br><br>
+                <input type="submit" id="loginButton" value="Login">
+            </label>
+            <br>
+        </form>
+        <br>
+        <p>Don't have an account?</p>
+        <a href="register">Register</a>
+    </div>
+
+    </body>
+
+</html>

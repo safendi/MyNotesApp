@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+
+        <style>
+
+            body {
+                background-color: darkgrey;
+                font-family: "Nerko One", system-ui;
+            }
+
+            #editor {
+                background-color: dimgray;
+                color: whitesmoke;
+                font-family: sans-serif;
+                font-size: 20px;
+            }
+
+            button {
+                background-color: cornflowerblue;
+                border-radius: 20px;
+                font-size: 14px;
+                font-family: Papyrus;
+                border-style: solid;
+                color: black;
+                border-color: black;
+                margin-top: 3px;
+            }
+
+            button:hover {
+                background-color: whitesmoke;
+            }
+
+            .quizAnswerChoice {
+                background-color: sandybrown;
+            }
+
+
+        </style>
+
+    </head>
+
+
+
+    <body onload="loadNotePage()">
+
+        <br> <button onclick="backToHome()">Go Back</button> <br>
+
+        <h2 id="nameOfClass">{{ className }}</h2>
+        <div style="display: inline-flex; align-items: center">
+            <box-icon name='edit-alt'></box-icon>
+            <h1 id="nameOfNote">{{ note }}</h1>
+        </div>
+
+        <div id="editor"></div>
+
+        <br><br>
+        <button id="updateNote()">Done</button>
+
+        <br><br>
+        <button id="aiBot">Generate a Quiz Using AI</button>
+
+        <br><br>
+        <div id="quizContents"></div>
+        <p id="loading" style="display: none">Loading..</p>
+
+
+        <script>
+
+            function backToHome() {
+                window.location = "/home"
+            }
+
+            function loadNotePage() {
+
+                $.ajax({
+                        url: '/redirect_to_notes',
+                        type: 'GET',
+                        success: function(response) {
+                            response = JSON.parse(response)
+                            data = response[document.getElementById('nameOfNote').innerHTML]
+
+                            const quill = new Quill('#editor', {
+                                    theme: 'snow'
+                            });
+
+                            if (data == '') {
+                                console.log("empty")
+                            } else {
+                                console.log("not empt")
+                                quill.setContents(data)
+                            }
+                             document.getElementById("updateNote()").onclick = () => {
+                                    $.ajax({
+                                        url: '/updateNote',
+                                        type: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify(quill.getContents()),
+                                        success: function(response) {
+                                            response = JSON.parse(response)
+                                            console.log(response)
+                                        },
+                                        error: function(error) {
+                                            console.log(error);
+                                        }
+                                    });
+                             }
+
+                            document.getElementById("aiBot").onclick = () => {
+                                $.ajax({
+                                    url: '/aiBot',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(quill.getText()),
+                                    success: function (response) {
+                                        response = JSON.parse(response)
+                                        console.log(response)
+                                        createQuiz(response)
+                                    },
+                                    error: function (error) {
+                                        console.log(error);
+                                    }
+                                });
+                            }
+
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+            }
+
+            function createQuiz(contents) {
+                let loading = document.getElementById("loading")
+                loading.style.display = 'block'
+
+                setTimeout( () => {
+                loading.style.display = 'none'
+                let div = document.getElementById("quizContents")
+                let i = 3
+
+                //get title
+                let title = ''
+                while (contents[i] != '#') {
+                    title += contents[i]
+                    i += 1
+                }
+
+                let titleHeader = document.createElement("h2")
+                titleHeader.innerHTML = title
+                div.appendChild(titleHeader)
+
+                //questions
+                while (contents[i] != "$" && contents[i + 1] != "$" && contents[i+2] != "$") {
+                    //question
+                    if (contents[i] == "*" && contents[i+1] == "*") {
+                        i += 2
+                        let question = ''
+                        let questionText = document.createElement("h3")
+                        while (contents[i] != '*' ) {
+                            question += contents[i]
+                            i += 1
+                        }
+                        questionText.innerHTML = question
+                        div.appendChild(questionText)
+                        i += 2
+                    }
+
+                    //choices
+                    if (contents[i] == '~' && contents[i+1] == '~' && contents[i+3] == '~' && contents[i+4] == '~') {
+                        //ABCD
+                        let answerChoiceButton = document.createElement("button")
+                        answerChoiceButton.className = "quizAnswerChoice"
+                        let choice = contents[i+2]
+                        let correct = contents[i+5]
+                        let choiceText=''
+                        i += 6
+                        while ((contents[i] != '~' && contents[i+1] != '~' && contents[i+3] != '~' && contents[i+4] != '~') && (contents[i] != "*" && contents[i+1] != "*")  && (contents[i] != "$" && contents[i+1] != "$") && (i < contents.length)) {
+                            choiceText += contents[i]
+                            i += 1
+                        }
+                        //get last letter
+                        if (i < contents.length &&
+                            !(contents[i] == '~' && contents[i+1] == '~' && contents[i+3] == '~' && contents[i+4] == '~') &&
+                            !(contents[i] == '*' && contents[i+1] == '*') &&
+                            !(contents[i] == '$' && contents[i+1] == '$')) {
+                            choiceText += contents[i];
+                        }
+
+                        answerChoiceButton.innerHTML = choice + ": " + choiceText
+
+                        //set correct or not
+                        if (correct == '1') {
+                            answerChoiceButton.onclick = () => {
+                                answerChoiceButton.style.backgroundColor = "Green"
+                            }
+                        } else {
+                            answerChoiceButton.onclick = () => {
+                                answerChoiceButton.style.backgroundColor = "Red"
+                            }
+                        }
+
+                        div.appendChild(answerChoiceButton)
+                        div.appendChild(document.createElement("br"))
+                    }
+
+                    i += 1
+                }
+                }, 1000)
+
+            }
+
+
+        </script>
+
+    </body>
+
+</html>

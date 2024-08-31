@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+
+
+
+    <body onload="loadClassData()">
+        <h1>{{className}}</h1>
+
+
+        <br><br>
+        <div id="newNoteCreator">
+            <button onclick="unhideNoteNamer()">Start a Note</button>
+            <div id="noteNamer" hidden="true">
+                <p>Name:</p>
+                <input type="text" id="newNoteName">
+                <button id="nameNoteButton" onclick="createNewNote()">Create</button>
+            </div>
+            <br><i>ex: Day 1, Lesson 1, Photosynthesis</i>
+        </div>
+
+        <br><br>
+        <div id="notesList">
+            <h2 hidden="true" id="noNotes">No notes currently</h2>
+        </div>
+
+        <script>
+            function loadClassData() {
+                $.ajax({
+                        url: '/home/classes',
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function(response) {
+                            response = JSON.parse(response)
+                            response = JSON.parse(response)
+                            console.log(response)
+                            if (response == '0'){
+                                document.getElementById("noNotes").hidden = false
+                            } else {
+                                document.getElementById("noNotes").hidden = true
+                                let div = document.getElementById("notesList")
+                                for (let note of Object.keys(response)) {
+                                    let button = document.createElement("button")
+                                    button.innerHTML = note
+                                    button.onclick = () => {
+                                        $.ajax({
+                                            url: '/redirect_to_notes',
+                                            type: 'POST',
+                                            contentType: 'application/json',
+                                            data: JSON.stringify(note),
+                                            success: function(response) {
+                                                response = JSON.parse(response)
+                                                console.log(response)
+                                                window.location = response
+                                            },
+                                            error: function(error) {
+                                                console.log(error);
+                                            }
+                                        });
+                                    }
+                                    div.appendChild(button)
+                                }
+                            }
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+            }
+
+            function unhideNoteNamer() {
+                document.getElementById("noteNamer").hidden = false
+            }
+
+            function createNewNote() {
+                $.ajax({
+                    url: '/notesAPI',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(document.getElementById("newNoteName").value),
+                    success: function(response) {
+                        response = JSON.parse(response)
+                        console.log(response)
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+                window.location.reload()
+            }
+        </script>
+
+    </body>
+
+
+</html>
