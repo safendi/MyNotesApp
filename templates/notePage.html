@@ -6,7 +6,6 @@
         <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
         <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 
@@ -38,6 +37,7 @@
 
             button:hover {
                 background-color: whitesmoke;
+                font-size: 16px;
             }
 
             .quizAnswerChoice {
@@ -53,7 +53,7 @@
 
     <body onload="loadNotePage()">
 
-        <br> <button onclick="backToHome()">Go Back</button> <br>
+        <br> <button onclick="backToHome()" style="background-color: darkred">Go Back</button> <br>
 
         <h2 id="nameOfClass">{{ className }}</h2>
         <div style="display: inline-flex; align-items: center">
@@ -64,14 +64,13 @@
         <div id="editor"></div>
 
         <br><br>
-        <button id="updateNote()">Done</button>
+        <button id="updateNote">Done</button>
 
         <br><br>
         <button id="aiBot">Generate a Quiz Using AI</button>
 
         <br><br>
         <div id="quizContents"></div>
-        <p id="loading" style="display: none">Loading..</p>
 
 
         <script>
@@ -99,7 +98,7 @@
                                 console.log("not empt")
                                 quill.setContents(data)
                             }
-                             document.getElementById("updateNote()").onclick = () => {
+                             document.getElementById("updateNote").onclick = () => {
                                     $.ajax({
                                         url: '/updateNote',
                                         type: 'POST',
@@ -108,6 +107,7 @@
                                         success: function(response) {
                                             response = JSON.parse(response)
                                             console.log(response)
+                                            window.location.reload()
                                         },
                                         error: function(error) {
                                             console.log(error);
@@ -140,11 +140,6 @@
             }
 
             function createQuiz(contents) {
-                let loading = document.getElementById("loading")
-                loading.style.display = 'block'
-
-                setTimeout( () => {
-                loading.style.display = 'none'
                 let div = document.getElementById("quizContents")
                 let i = 3
 
@@ -215,7 +210,6 @@
 
                     i += 1
                 }
-                }, 1000)
 
             }
 

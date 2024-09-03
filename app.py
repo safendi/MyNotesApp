@@ -7,7 +7,7 @@ from openai import OpenAI
 app = Flask(__name__)
 app.secret_key = 'sheffg'
 
-conn = sqlite3.connect('notes4.db', check_same_thread=False)
+conn = sqlite3.connect('notes.db', check_same_thread=False)
 cursor = conn.cursor()
 cursor.execute("""CREATE TABLE IF NOT EXISTS notes (
                     username text,

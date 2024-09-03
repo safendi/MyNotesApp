@@ -1,32 +1,90 @@
 <!DOCTYPE html>
 <html>
     <head>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+        <style>
+
+            body {
+                background-color: darkgrey;
+                font-family: "Nerko One", system-ui;
+            }
+
+            button {
+                cursor: pointer;
+                background-color: cornflowerblue;
+                border-radius: 20px;
+                font-size: 14px;
+                font-family: Papyrus;
+                border-style: solid;
+                color: black;
+                border-color: black;
+                margin-top: 3px;
+            }
+
+            button:hover {
+                background-color: whitesmoke;
+                font-size: 16px;
+            }
+
+            #noteNamer {
+                border: solid black 2px;
+                border-radius: 10px;
+                position: absolute;
+                padding: 20px;
+                background-color: dimgray;
+                /* Center the div itself */
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+
+                /* Center the contents */
+                display: none;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+        </style>
+
     </head>
 
 
 
     <body onload="loadClassData()">
+
+        <button onclick="backToHome()" style="background-color: darkred">Go Back</button>
         <h1>{{className}}</h1>
 
 
         <br><br>
         <div id="newNoteCreator">
-            <button onclick="unhideNoteNamer()">Start a Note</button>
-            <div id="noteNamer" hidden="true">
-                <p>Name:</p>
-                <input type="text" id="newNoteName">
-                <button id="nameNoteButton" onclick="createNewNote()">Create</button>
+            <button onclick="unhideNoteNamer()" style="background-color: darkolivegreen">New Note</button>
+            <div id="noteNamer">
+                <button style="position: absolute; right: 5px; top: 5px; background-color: darkred; color: whitesmoke; padding: 1px 4px; border-radius: 3px" onclick="hideNoteNamer()">X</button>
+                <p>What do you want to name this note?</p>
+                <input type="text" id="newNoteName"><br>
+                <button id="nameNoteButton" onclick="createNewNote()" style="background-color: darkolivegreen">Create</button>
             </div>
             <br><i>ex: Day 1, Lesson 1, Photosynthesis</i>
         </div>
 
         <br><br>
         <div id="notesList">
+            <h3> My Notes:</h3>
             <h2 hidden="true" id="noNotes">No notes currently</h2>
         </div>
 
         <script>
+            function backToHome(){
+                window.location = "/home"
+            }
+
             function loadClassData() {
                 $.ajax({
                         url: '/home/classes',
@@ -71,7 +129,10 @@
             }
 
             function unhideNoteNamer() {
-                document.getElementById("noteNamer").hidden = false
+                document.getElementById("noteNamer").style.display = "block"
+            }
+            function hideNoteNamer() {
+                document.getElementById("noteNamer").style.display = "none"
             }
 
             function createNewNote() {
