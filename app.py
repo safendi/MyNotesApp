@@ -17,8 +17,8 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS notes (
 
 
 
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-
+#client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+client = OpenAI(api_key="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")
 
 
 @app.route('/')
@@ -80,7 +80,7 @@ def classes_home():
         className = session.get('className')
         cursor.execute("SELECT * FROM notes WHERE class = ? AND username = ?", (className, session['username']))
         data = cursor.fetchone()
-        if data[2] == '':
+        if data[2] == '{}':
             return (json.dumps("0"))
         else :
             return (json.dumps(data[2]))
@@ -89,6 +89,7 @@ def classes_home():
 
 @app.route('/class/<string:className>')
 def class_notes(className):
+    session['className'] = className
     print(className)
     return render_template('classNotes.html', className = className)
 
@@ -105,7 +106,6 @@ def notesAPI():
         print(data)
         if data.get(noteName) is None:
             data[noteName] = ''
-            print(data)
             cursor.execute("REPLACE INTO notes VALUES (?, ? ,?)", (session['username'], session['className'], json.dumps(data)))
             conn.commit()
             cursor.execute("SELECT * FROM notes WHERE class = ? AND username = ?", (session['className'], session['username']))
@@ -126,7 +126,6 @@ def redirect_to_notes():
         className = session.get('className')
         cursor.execute("SELECT * FROM notes WHERE class = ? AND username = ?", (className, session['username']))
         data = cursor.fetchone()
-        print(data[2])
         return (data[2])
 
 
@@ -138,8 +137,8 @@ def class_note(className, note):
 @app.route('/updateNote', methods=['GET', 'POST'])
 def updateNote():
     if request.method == 'POST':
+        #Set sesh classname to current page: session['className'] = 
         contents = request.get_json()
-        print(contents)
         cursor.execute("SELECT * FROM notes WHERE class = ? AND username = ?", (session['className'], session['username']))
         data = cursor.fetchone()
         data = json.loads(data[2])
@@ -156,7 +155,6 @@ def updateNote():
 def aiBot():
     if request.method == 'POST':
         data = request.get_json()
-        print(data)
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
