@@ -3,9 +3,12 @@ import sqlite3
 import json
 import os
 from openai import OpenAI
+import uuid
+from dotenv import load_dotenv
+load_dotenv
 
 app = Flask(__name__)
-app.secret_key = 'sheffg'
+app.secret_key = os.getenv('SECRET_KEY')
 
 conn = sqlite3.connect('notes.db', check_same_thread=False)
 cursor = conn.cursor()
@@ -15,10 +18,7 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS notes (
                     notes text)""")
 
 
-
-
-#client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-client = OpenAI(api_key="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")
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 
 @app.route('/')
@@ -170,4 +170,4 @@ def aiBot():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=8080)
