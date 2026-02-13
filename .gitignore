@@ -12,3 +12,4 @@
 /.env
 /myenv/
 /__pycache__/
+/docker-compose.yml
