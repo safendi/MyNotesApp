@@ -12,7 +12,7 @@ app.secret_key = os.getenv('SECRET_KEY', 'devsecret')
 
 
 # MongoDB 
-mongo_uri = os.getenv("MONGO_URI", "mongodb://mongo:27017")
+mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 mongo_client = MongoClient(mongo_uri)
 db = mongo_client["notesdb"]
 notes_collection = db["notes"]

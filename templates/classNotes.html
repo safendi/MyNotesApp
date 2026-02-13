@@ -1,159 +1,210 @@
 <!DOCTYPE html>
-<html>
-    <head>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ className }}</title>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
-        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
 
-        <style>
+<style>
+body {
+    margin: 0;
+    font-family: "Nerko One", cursive;
+    background: linear-gradient(135deg, #2f2f2f, #1e1e1e);
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
 
-            body {
-                background-color: darkgrey;
-                font-family: "Nerko One", system-ui;
-            }
+.container {
+    width: 100%;
+    max-width: 600px;
+}
 
-            button {
-                cursor: pointer;
-                background-color: cornflowerblue;
-                border-radius: 20px;
-                font-size: 14px;
-                font-family: Papyrus;
-                border-style: solid;
-                color: black;
-                border-color: black;
-                margin-top: 3px;
-            }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-            button:hover {
-                background-color: whitesmoke;
-                font-size: 16px;
-            }
+button {
+    cursor: pointer;
+    background-color: cornflowerblue;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    margin: 6px 0;
+    transition: 0.2s ease;
+}
 
-            #noteNamer {
-                border: solid black 2px;
-                border-radius: 10px;
-                position: absolute;
-                padding: 20px;
-                background-color: dimgray;
-                /* Center the div itself */
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+button:hover {
+    background-color: white;
+    color: black;
+}
 
-                /* Center the contents */
-                display: none;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-            }
+.note-button {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+}
 
-        </style>
+.section {
+    margin-top: 30px;
+}
 
-    </head>
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
 
+.modal {
+    background: #3a3a3a;
+    padding: 25px;
+    border-radius: 15px;
+    width: 300px;
+    text-align: center;
+}
 
+input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 15px;
+    border: none;
+    margin-bottom: 10px;
+    text-align: center;
+}
 
-    <body onload="loadClassData()">
+.hidden {
+    display: none;
+}
 
-        <button onclick="backToHome()" style="background-color: darkred">Go Back</button>
-        <h1>{{className}}</h1>
+</style>
+</head>
 
+<body>
+<div class="container">
 
-        <br><br>
-        <div id="newNoteCreator">
-            <button onclick="unhideNoteNamer()" style="background-color: darkolivegreen">New Note</button>
-            <div id="noteNamer">
-                <button style="position: absolute; right: 5px; top: 5px; background-color: darkred; color: whitesmoke; padding: 1px 4px; border-radius: 3px" onclick="hideNoteNamer()">X</button>
-                <p>What do you want to name this note?</p>
-                <input type="text" id="newNoteName"><br>
-                <button id="nameNoteButton" onclick="createNewNote()" style="background-color: darkolivegreen">Create</button>
-            </div>
-            <br><i>ex: Day 1, Lesson 1, Photosynthesis</i>
-        </div>
+<div class="header">
+    <h1>{{ className }}</h1>
+    <button onclick="goBack()" style="background-color: darkred;">← Back</button>
+</div>
 
-        <br><br>
-        <div id="notesList">
-            <h3> My Notes:</h3>
-            <h2 hidden="true" id="noNotes">No notes currently</h2>
-        </div>
+<div class="section">
+    <button onclick="openModal()" style="background-color: darkolivegreen;">+ New Note</button>
+    <p><i>ex: Day 1, Lesson 1, Photosynthesis</i></p>
+</div>
 
-        <script>
-            function backToHome(){
-                window.location = "/home"
-            }
+<div class="section">
+    <h3>My Notes</h3>
+    <h2 id="noNotes" class="hidden">No notes currently</h2>
+    <div id="notesList"></div>
+</div>
 
-            function loadClassData() {
-                $.ajax({
-                        url: '/home/classes',
-                        type: 'GET',
-                        contentType: 'application/json',
-                        success: function(response) {
-                            response = JSON.parse(response)
-                            response = JSON.parse(response)
-                            console.log(response)
-                            if (response == '0'){
-                                document.getElementById("noNotes").hidden = false
-                            } else {
-                                document.getElementById("noNotes").hidden = true
-                                let div = document.getElementById("notesList")
-                                for (let note of Object.keys(response)) {
-                                    let button = document.createElement("button")
-                                    button.innerHTML = note
-                                    button.onclick = () => {
-                                        $.ajax({
-                                            url: '/redirect_to_notes',
-                                            type: 'POST',
-                                            contentType: 'application/json',
-                                            data: JSON.stringify(note),
-                                            success: function(response) {
-                                                response = JSON.parse(response)
-                                                console.log(response)
-                                                window.location = response
-                                            },
-                                            error: function(error) {
-                                                console.log(error);
-                                            }
-                                        });
-                                    }
-                                    div.appendChild(button)
-                                }
-                            }
-                        },
-                        error: function(error) {
-                            console.log(error);
-                        }
-                    });
-            }
+</div>
 
-            function unhideNoteNamer() {
-                document.getElementById("noteNamer").style.display = "block"
-            }
-            function hideNoteNamer() {
-                document.getElementById("noteNamer").style.display = "none"
-            }
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h3>Name Your Note</h3>
+        <input type="text" id="newNoteName" placeholder="Enter note name">
+        <button onclick="createNote()">Create</button>
+        <button onclick="closeModal()" style="background-color: darkred;">Cancel</button>
+    </div>
+</div>
 
-            function createNewNote() {
-                $.ajax({
-                    url: '/notesAPI',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(document.getElementById("newNoteName").value),
-                    success: function(response) {
-                        response = JSON.parse(response)
-                        console.log(response)
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
-                });
-                window.location.reload()
-            }
-        </script>
+<script>
 
-    </body>
+document.addEventListener("DOMContentLoaded", loadClassData);
 
+function goBack() {
+    window.location.href = "/home";
+}
 
+async function loadClassData() {
+    try {
+        const res = await fetch('/home/classes');
+        const data = await res.json();
+
+        const noNotes = document.getElementById("noNotes");
+        const list = document.getElementById("notesList");
+        list.innerHTML = "";
+
+        if (!data || data === "0" || Object.keys(data).length === 0) {
+            noNotes.classList.remove("hidden");
+            return;
+        }
+
+        noNotes.classList.add("hidden");
+
+        Object.keys(data).forEach(note => {
+            const btn = document.createElement("button");
+            btn.textContent = note;
+            btn.className = "note-button";
+
+            btn.addEventListener("click", () => openNote(note));
+
+            list.appendChild(btn);
+        });
+
+    } catch (err) {
+        console.error("Failed to load notes:", err);
+    }
+}
+
+async function openNote(note) {
+    try {
+        const res = await fetch('/redirect_to_notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(note)
+        });
+
+        const route = await res.json();
+        window.location.href = route;
+
+    } catch (err) {
+        console.error("Failed to open note:", err);
+    }
+}
+
+function openModal() {
+    document.getElementById("modalOverlay").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("modalOverlay").style.display = "none";
+    document.getElementById("newNoteName").value = "";
+}
+
+async function createNote() {
+    const name = document.getElementById("newNoteName").value.trim();
+
+    if (!name) {
+        alert("Please enter a note name.");
+        return;
+    }
+
+    try {
+        await fetch('/notesAPI', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(name)
+        });
+
+        closeModal();
+        loadClassData(); // Refresh without reload
+
+    } catch (err) {
+        console.error("Failed to create note:", err);
+    }
+}
+
+</script>
+</body>
 </html>

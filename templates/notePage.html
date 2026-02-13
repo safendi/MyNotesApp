@@ -1,221 +1,209 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
-        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ note }}</title>
 
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
 
-        <style>
+<style>
+body {
+    margin: 0;
+    font-family: "Nerko One", cursive;
+    background: linear-gradient(135deg, #2f2f2f, #1e1e1e);
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
 
-            body {
-                background-color: darkgrey;
-                font-family: "Nerko One", system-ui;
-            }
+.container {
+    width: 100%;
+    max-width: 900px;
+}
 
-            #editor {
-                background-color: dimgray;
-                color: whitesmoke;
-                font-family: sans-serif;
-                font-size: 20px;
-            }
+h1, h2 {
+    margin: 10px 0;
+}
 
-            button {
-                background-color: cornflowerblue;
-                border-radius: 20px;
-                font-size: 14px;
-                font-family: Papyrus;
-                border-style: solid;
-                color: black;
-                border-color: black;
-                margin-top: 3px;
-            }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-            button:hover {
-                background-color: whitesmoke;
-                font-size: 16px;
-            }
+button {
+    background: cornflowerblue;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    margin: 6px 0;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
 
-            .quizAnswerChoice {
-                background-color: sandybrown;
-            }
+button:hover {
+    background: white;
+    color: black;
+}
 
+#editor {
+    background: white;
+    color: black;
+    border-radius: 10px;
+    margin-top: 20px;
+}
 
-        </style>
+.section {
+    margin-top: 30px;
+}
 
-    </head>
+.quizAnswerChoice {
+    display: block;
+    width: 100%;
+    margin: 6px 0;
+    background: sandybrown;
+}
 
+.correct { background: green !important; }
+.incorrect { background: crimson !important; }
 
+</style>
+</head>
 
-    <body onload="loadNotePage()">
+<body>
+<div class="container">
 
-        <br> <button onclick="backToHome()" style="background-color: darkred">Go Back</button> <br>
+<div class="header">
+    <div>
+        <h2>{{ className }}</h2>
+        <h1>{{ note }}</h1>
+    </div>
+    <button onclick="goBack()">← Back</button>
+</div>
 
-        <h2 id="nameOfClass">{{ className }}</h2>
-        <div style="display: inline-flex; align-items: center">
-            <box-icon name='edit-alt'></box-icon>
-            <h1 id="nameOfNote">{{ note }}</h1>
-        </div>
+<div id="editor"></div>
 
-        <div id="editor"></div>
+<div class="section">
+    <button onclick="saveNote()">Save</button>
+    <button onclick="generateQuiz()">Generate Quiz (AI)</button>
+</div>
 
-        <br><br>
-        <button id="updateNote">Done</button>
+<div class="section" id="quizContents"></div>
 
-        <br><br>
-        <button id="aiBot">Generate a Quiz Using AI</button>
+</div>
 
-        <br><br>
-        <div id="quizContents"></div>
+<script>
 
+let quill;
 
-        <script>
+document.addEventListener("DOMContentLoaded", async () => {
+    quill = new Quill('#editor', { theme: 'snow' });
+    await loadNote();
+});
 
-            function backToHome() {
-                window.location = "/home"
-            }
+function goBack() {
+    window.location.href = "/home";
+}
 
-            function loadNotePage() {
+async function loadNote() {
+    try {
+        const res = await fetch('/redirect_to_notes');
+        const data = await res.json();
+        const noteName = "{{ note }}";
 
-                $.ajax({
-                        url: '/redirect_to_notes',
-                        type: 'GET',
-                        success: function(response) {
-                            response = JSON.parse(response)
-                            data = response[document.getElementById('nameOfNote').innerHTML]
+        if (data[noteName]) {
+            quill.setContents(data[noteName]);
+        }
+    } catch (err) {
+        console.error("Failed to load note:", err);
+    }
+}
 
-                            const quill = new Quill('#editor', {
-                                    theme: 'snow'
-                            });
+async function saveNote() {
+    try {
+        await fetch('/updateNote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(quill.getContents())
+        });
 
-                            if (data == '') {
-                                console.log("empty")
-                            } else {
-                                console.log("not empt")
-                                quill.setContents(data)
-                            }
-                             document.getElementById("updateNote").onclick = () => {
-                                    $.ajax({
-                                        url: '/updateNote',
-                                        type: 'POST',
-                                        contentType: 'application/json',
-                                        data: JSON.stringify(quill.getContents()),
-                                        success: function(response) {
-                                            response = JSON.parse(response)
-                                            console.log(response)
-                                            window.location.reload()
-                                        },
-                                        error: function(error) {
-                                            console.log(error);
-                                        }
-                                    });
-                             }
+        alert("Saved!");
+    } catch (err) {
+        console.error("Failed to save:", err);
+    }
+}
 
-                            document.getElementById("aiBot").onclick = () => {
-                                $.ajax({
-                                    url: '/aiBot',
-                                    type: 'POST',
-                                    contentType: 'application/json',
-                                    data: JSON.stringify(quill.getText()),
-                                    success: function (response) {
-                                        response = JSON.parse(response)
-                                        console.log(response)
-                                        createQuiz(response)
-                                    },
-                                    error: function (error) {
-                                        console.log(error);
-                                    }
-                                });
-                            }
+async function generateQuiz() {
+    try {
+        const res = await fetch('/aiBot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(quill.getText())
+        });
 
-                        },
-                        error: function(error) {
-                            console.log(error);
-                        }
-                    });
-            }
+        const text = await res.json();
+        renderQuiz(text);
 
-            function createQuiz(contents) {
-                let div = document.getElementById("quizContents")
-                let i = 3
+    } catch (err) {
+        console.error("Failed to generate quiz:", err);
+    }
+}
 
-                //get title
-                let title = ''
-                while (contents[i] != '#') {
-                    title += contents[i]
-                    i += 1
-                }
+function renderQuiz(text) {
+    const container = document.getElementById("quizContents");
+    container.innerHTML = "";
 
-                let titleHeader = document.createElement("h2")
-                titleHeader.innerHTML = title
-                div.appendChild(titleHeader)
+    if (!text) return;
 
-                //questions
-                while (contents[i] != "$" && contents[i + 1] != "$" && contents[i+2] != "$") {
-                    //question
-                    if (contents[i] == "*" && contents[i+1] == "*") {
-                        i += 2
-                        let question = ''
-                        let questionText = document.createElement("h3")
-                        while (contents[i] != '*' ) {
-                            question += contents[i]
-                            i += 1
-                        }
-                        questionText.innerHTML = question
-                        div.appendChild(questionText)
-                        i += 2
-                    }
+    // Extract title
+    const titleMatch = text.match(/###(.*?)###/);
+    if (titleMatch) {
+        const h2 = document.createElement("h2");
+        h2.textContent = titleMatch[1];
+        container.appendChild(h2);
+    }
 
-                    //choices
-                    if (contents[i] == '~' && contents[i+1] == '~' && contents[i+3] == '~' && contents[i+4] == '~') {
-                        //ABCD
-                        let answerChoiceButton = document.createElement("button")
-                        answerChoiceButton.className = "quizAnswerChoice"
-                        let choice = contents[i+2]
-                        let correct = contents[i+5]
-                        let choiceText=''
-                        i += 6
-                        while ((contents[i] != '~' && contents[i+1] != '~' && contents[i+3] != '~' && contents[i+4] != '~') && (contents[i] != "*" && contents[i+1] != "*")  && (contents[i] != "$" && contents[i+1] != "$") && (i < contents.length)) {
-                            choiceText += contents[i]
-                            i += 1
-                        }
-                        //get last letter
-                        if (i < contents.length &&
-                            !(contents[i] == '~' && contents[i+1] == '~' && contents[i+3] == '~' && contents[i+4] == '~') &&
-                            !(contents[i] == '*' && contents[i+1] == '*') &&
-                            !(contents[i] == '$' && contents[i+1] == '$')) {
-                            choiceText += contents[i];
-                        }
+    // Extract questions
+    const questionRegex = /\*\*(.*?)\*\*/g;
+    const choiceRegex = /~~([a-d])~~([01])(.*?)(?=(~~[a-d]~~[01]|\*\*|\$\$\$))/gs;
 
-                        answerChoiceButton.innerHTML = choice + ": " + choiceText
+    let questions = [...text.matchAll(questionRegex)];
 
-                        //set correct or not
-                        if (correct == '1') {
-                            answerChoiceButton.onclick = () => {
-                                answerChoiceButton.style.backgroundColor = "Green"
-                            }
-                        } else {
-                            answerChoiceButton.onclick = () => {
-                                answerChoiceButton.style.backgroundColor = "Red"
-                            }
-                        }
+    questions.forEach((qMatch, index) => {
+        const qText = qMatch[1];
 
-                        div.appendChild(answerChoiceButton)
-                        div.appendChild(document.createElement("br"))
-                    }
+        const qHeader = document.createElement("h3");
+        qHeader.textContent = qText;
+        container.appendChild(qHeader);
 
-                    i += 1
-                }
+        let choicesStart = qMatch.index + qMatch[0].length;
+        let nextQuestionIndex = (questions[index+1]) ? questions[index+1].index : text.length;
+        let choicesBlock = text.slice(choicesStart, nextQuestionIndex);
 
-            }
+        let choices = [...choicesBlock.matchAll(choiceRegex)];
 
+        choices.forEach(choice => {
+            const letter = choice[1];
+            const correct = choice[2] === "1";
+            const label = choice[3].trim();
 
-        </script>
+            const btn = document.createElement("button");
+            btn.className = "quizAnswerChoice";
+            btn.textContent = `${letter.toUpperCase()}: ${label}`;
 
-    </body>
+            btn.onclick = () => {
+                btn.classList.add(correct ? "correct" : "incorrect");
+            };
 
+            container.appendChild(btn);
+        });
+    });
+}
+
+</script>
+</body>
 </html>
