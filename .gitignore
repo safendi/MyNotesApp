@@ -10,3 +10,5 @@
 /.venv/
 /notes.db
 /.env
+/myenv/
+/__pycache__/
