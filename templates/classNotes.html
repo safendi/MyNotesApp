@@ -23,7 +23,6 @@
             align-items: center;
         }
 
-        /* ── Header ── */
         header {
             width: 100%;
             background: #2a2a2a;
@@ -93,7 +92,6 @@
             color: #ff7f7f;
         }
 
-        /* ── Page content ── */
         .page {
             width: 100%;
             max-width: 600px;
@@ -101,7 +99,6 @@
             animation: fadeIn 0.4s ease-in;
         }
 
-        /* ── Page header row ── */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -114,7 +111,6 @@
             font-size: 36px;
         }
 
-        /* ── Buttons ── */
         button {
             cursor: pointer;
             font-family: "Nerko One", cursive;
@@ -157,7 +153,6 @@
             color: black;
         }
 
-        /* ── Hint text ── */
         .hint {
             font-size: 13px;
             color: #888;
@@ -165,7 +160,6 @@
             font-style: italic;
         }
 
-        /* ── Section ── */
         .section {
             margin-top: 35px;
         }
@@ -178,7 +172,6 @@
             padding-bottom: 8px;
         }
 
-        /* ── Note buttons ── */
         .note-button {
             display: flex;
             align-items: center;
@@ -199,14 +192,12 @@
 
         .note-button:hover .arrow { opacity: 1; }
 
-        /* ── Empty state ── */
         .empty-state {
             color: #888;
             font-size: 15px;
             margin-top: 12px;
         }
 
-        /* ── Modal ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -272,7 +263,6 @@
             color: black;
         }
 
-        /* ── Animations ── */
         .hidden { display: none; }
 
         .fade-in {
@@ -288,7 +278,6 @@
 
 <body>
 
-<!-- ── Header ── -->
 <header>
     <a href="/home" class="logo">Quiz<span>Notes</span></a>
     <div class="header-right">
@@ -298,11 +287,10 @@
     </div>
 </header>
 
-<!-- ── Page ── -->
 <div class="page">
 
     <div class="page-header">
-        <h1>{{ className }}</h1>
+        <h1><span style="color: #777;">Class: </span>{{ className }}</h1>
         <button class="btn-back" onclick="goBack()">← Back</button>
     </div>
 
@@ -319,7 +307,6 @@
 
 </div>
 
-<!-- ── Modal ── -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <h3>Name Your Note</h3>

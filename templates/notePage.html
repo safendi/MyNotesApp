@@ -200,23 +200,63 @@
         }
 
         #editor {
-            background: white;
-            color: black;
-            border-radius: 10px;
+            background: #1c1c1c;
+            color: #f0f0f0;
+            border-radius: 12px;
             margin-top: 4px;
             min-height: 300px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         .ql-toolbar.ql-snow {
-            border-radius: 10px 10px 0 0;
-            border-color: #555 !important;
+            border-radius: 12px 12px 0 0;
+            border-color: #444 !important;
+            background: #2a2a2a;
         }
 
         .ql-container.ql-snow {
-            border-radius: 0 0 10px 10px;
-            border-color: #555 !important;
+            border-radius: 0 0 12px 12px;
+            border-color: #444 !important;
+            font-size: 17px;
+            line-height: 1.7;
         }
 
+        /* Make Quill toolbar icons visible on dark background */
+        .ql-toolbar .ql-stroke {
+            stroke: #ccc !important;
+        }
+
+        .ql-toolbar .ql-fill {
+            fill: #ccc !important;
+        }
+
+        .ql-toolbar .ql-picker-label {
+            color: #ccc !important;
+        }
+
+        .ql-toolbar button:hover .ql-stroke,
+        .ql-toolbar .ql-active .ql-stroke {
+            stroke: white !important;
+        }
+
+        .ql-toolbar button:hover .ql-fill,
+        .ql-toolbar .ql-active .ql-fill {
+            fill: white !important;
+        }
+
+        .ql-editor {
+            padding: 20px 24px;
+            min-height: 280px;
+            color: #f0f0f0 !important;
+            caret-color: #f0f0f0;
+        }
+
+        .ql-editor.ql-blank::before {
+            color: #666 !important;
+            font-style: italic;
+        }
+
+        /* ── Quiz section ── */
         .section {
             margin-top: 35px;
         }
@@ -232,6 +272,10 @@
         .section h3 {
             margin: 20px 0 10px;
             font-size: 17px;
+            font-family: 'Georgia', serif;
+            font-weight: normal;
+            color: #eee;
+            line-height: 1.5;
         }
 
         .quizAnswerChoice {
@@ -239,11 +283,14 @@
             align-items: center;
             width: 100%;
             margin: 6px 0;
-            padding: 10px 18px;
+            padding: 11px 20px;
             background: #7a6040;
             text-align: left;
             border-radius: 20px;
             transition: 0.2s ease;
+            font-family: 'Georgia', serif;
+            font-size: 15px;
+            line-height: 1.5;
         }
 
         .quizAnswerChoice:hover {
@@ -421,13 +468,16 @@ function renderQuiz(text) {
         const qText = qMatch[1];
 
         const qHeader = document.createElement("h3");
-        qHeader.textContent = `${index + 1}. ${qText}`;
+        qHeader.textContent = qText;
         container.appendChild(qHeader);
 
         const choicesStart = qMatch.index + qMatch[0].length;
         const nextQuestionIndex = questions[index + 1] ? questions[index + 1].index : text.length;
         const choicesBlock = text.slice(choicesStart, nextQuestionIndex);
         const choices = [...choicesBlock.matchAll(choiceRegex)];
+
+        const choicesDiv = document.createElement("div");
+        container.appendChild(choicesDiv);
 
         choices.forEach(choice => {
             const letter  = choice[1];
@@ -437,15 +487,22 @@ function renderQuiz(text) {
             const btn = document.createElement("button");
             btn.className = "quizAnswerChoice fade-in";
             btn.textContent = `${letter.toUpperCase()}: ${label}`;
+            btn._isCorrect = correct;
 
             btn.onclick = () => {
-                btn.closest("div")?.querySelectorAll(".quizAnswerChoice").forEach(b => {
+                choicesDiv.querySelectorAll(".quizAnswerChoice").forEach(b => {
                     b.classList.add("answered");
                 });
                 btn.classList.add(correct ? "correct" : "incorrect");
+
+                if (!correct) {
+                    choicesDiv.querySelectorAll(".quizAnswerChoice").forEach(b => {
+                        if (b._isCorrect) b.classList.add("correct");
+                    });
+                }
             };
 
-            container.appendChild(btn);
+            choicesDiv.appendChild(btn);
         });
     });
 }

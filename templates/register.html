@@ -18,11 +18,28 @@
             background: linear-gradient(135deg, #2f2f2f, #1e1e1e);
             color: white;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 30px 20px;
+            gap: 24px;
         }
 
+        /* ── Logo ── */
+        .logo {
+            font-size: 52px;
+            color: cornflowerblue;
+            text-decoration: none;
+            letter-spacing: 1px;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        /* ── Card ── */
         .container {
             width: 100%;
             max-width: 500px;
@@ -153,6 +170,8 @@
     </style>
 </head>
 <body>
+
+<a href="/" class="logo">Quiz<span>Notes</span></a>
 
 <div class="container">
     <h1>Create Account</h1>
