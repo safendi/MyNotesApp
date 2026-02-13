@@ -1,119 +1,159 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
-        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Classes</title>
 
-        <style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-            body {
-                background-color: darkgrey;
-                font-family: "Nerko One", system-ui;
-            }
+    <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
 
-            button {
-                background-color: cornflowerblue;
-                border-radius: 20px;
-                font-size: 14px;
-                font-family: Papyrus;
-                border-style: solid;
-                color: black;
-                border-color: black;
-                margin-top: 3px;
-            }
+    <style>
+        body {
+            background: #2f2f2f;
+            font-family: "Nerko One", cursive;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 40px;
+        }
 
-            button:hover {
-                background-color: whitesmoke;
-                font-size: 16px;
-            }
+        h1 {
+            font-size: 40px;
+            margin-bottom: 30px;
+        }
 
-        </style>
-    </head>
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
 
+        button {
+            background-color: cornflowerblue;
+            border-radius: 25px;
+            font-size: 16px;
+            padding: 8px 18px;
+            border: none;
+            cursor: pointer;
+            margin: 6px;
+            transition: 0.2s ease-in-out;
+        }
 
-    <body onload="loadClasses()">
+        button:hover {
+            background-color: white;
+            color: black;
+            transform: scale(1.05);
+        }
 
-        <button onclick="addClassClicked()" id="addClassButton">Add a Class</button>
-        <div id="classAdder" hidden="true">
-            <input type="text" id="classBeingAdded">
-            <button onclick="classAdded()">Submit</button>
-        </div>
+        input {
+            padding: 8px;
+            border-radius: 20px;
+            border: none;
+            width: 200px;
+            text-align: center;
+        }
 
-        <br><br><br><br>
-        <div id="currentClasses">
+        #classAdder {
+            margin-top: 15px;
+        }
 
-        </div>
+        #currentClasses {
+            margin-top: 40px;
+        }
 
+        .class-button {
+            display: block;
+            width: 100%;
+        }
 
-        <script>
-            function loadClasses() {
-                $.ajax({
-                        url: '/Classes',
-                        type: 'GET',
-                        contentType: 'application/json',
-                        success: function(response) {
-                            response = JSON.parse(response)
-                            console.log(response)
-                            for (let course of response) {
-                                let classesDiv = document.getElementById("currentClasses")
-                                let button = document.createElement("button")
-                                button.innerHTML = course
-                                button.onclick = () => {
-                                   $.ajax({
-                                        url: '/home/classes',
-                                        type: 'POST',
-                                        contentType: 'application/json',
-                                        data: JSON.stringify(course),
-                                        success: function(response) {
-                                            response = JSON.parse(response)
-                                            console.log(response)
-                                            window.location = '/class/' + response
-                                        },
-                                        error: function(error) {
-                                            console.log(error);
-                                        }
-                                    });
-                                }
-                                classesDiv.appendChild(button)
+    </style>
+</head>
+
+<body onload="loadClasses()">
+
+<div class="container">
+    <h1>Your Classes</h1>
+
+    <button onclick="showClassAdder()" id="addClassButton">+ Add Class</button>
+
+    <div id="classAdder" hidden>
+        <input type="text" id="classBeingAdded" placeholder="Enter class name">
+        <button onclick="classAdded()">Submit</button>
+    </div>
+
+    <div id="currentClasses"></div>
+</div>
+
+<script>
+
+    function loadClasses() {
+        $.ajax({
+            url: '/Classes',
+            type: 'GET',
+            success: function(response) {
+                let classes = typeof response === "string" ? JSON.parse(response) : response;
+
+                let classesDiv = document.getElementById("currentClasses");
+                classesDiv.innerHTML = "";
+
+                classes.forEach(course => {
+                    let button = document.createElement("button");
+                    button.innerText = course;
+                    button.className = "class-button";
+
+                    button.onclick = function() {
+                        $.ajax({
+                            url: '/home/classes',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(course),
+                            success: function(response) {
+                                let className = typeof response === "string" ? JSON.parse(response) : response;
+                                window.location.href = '/class/' + className;
                             }
-                        },
-                        error: function(error) {
-                            console.log(error);
-                        }
-                    });
+                        });
+                    };
+
+                    classesDiv.appendChild(button);
+                });
+            },
+            error: function(error) {
+                console.error("Error loading classes:", error);
             }
+        });
+    }
 
-            function addClassClicked() {
-                document.getElementById("classAdder").hidden = false
-                document.getElementById("addClassButton").hidden = true
+    function showClassAdder() {
+        document.getElementById("classAdder").hidden = false;
+        document.getElementById("addClassButton").hidden = true;
+    }
+
+    function classAdded() {
+        let className = document.getElementById("classBeingAdded").value.trim();
+
+        if (!className) {
+            alert("Please enter a class name.");
+            return;
+        }
+
+        $.ajax({
+            url: '/Classes',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(className),
+            success: function(response) {
+                loadClasses(); // reload dynamically
+                document.getElementById("classBeingAdded").value = "";
+                document.getElementById("classAdder").hidden = true;
+                document.getElementById("addClassButton").hidden = false;
+            },
+            error: function(error) {
+                console.error("Error adding class:", error);
             }
+        });
+    }
 
-            function classAdded() {
-                document.getElementById("classAdder").hidden = true
-                document.getElementById("addClassButton").hidden = false
-                let className = document.getElementById("classBeingAdded").value
-                $.ajax({
-                        url: '/Classes',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(className),
-                        success: function(response) {
-                            response = JSON.parse(response)
-                            console.log(response)
-                        },
-                        error: function(error) {
-                            console.log(error);
-                        }
-                    });
-                window.location.reload()
-                }
+</script>
 
-        </script>
-
-
-    </body>
-
+</body>
 </html>

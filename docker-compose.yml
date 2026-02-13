@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:4.2.5
+    ports:
+      - "27017:27017"
+
+  myapp:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      OPENAI_API_KEY: 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
+      SECRET_KEY: sheffg
+    depends_on:
+      - mongo
