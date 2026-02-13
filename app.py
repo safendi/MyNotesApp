@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 from pymongo import MongoClient
-import json
-import os
-from openai import OpenAI
 from dotenv import load_dotenv
+import os
+import bcrypt
+from openai import OpenAI
+import json
 
 load_dotenv()
 
@@ -11,31 +12,88 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'devsecret')
 
 
-# MongoDB 
+# mongo 
 mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 mongo_client = MongoClient(mongo_uri)
 db = mongo_client["notesdb"]
 notes_collection = db["notes"]
+users_collection = db['users']
 
 
-# OpenAI
+# open AI
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 
-# Routes
+# routes
 
 @app.route('/')
-def landing():
-    return render_template('landing.html')
+def index():
+    if "username" in session:
+        return redirect(url_for("home"))
+    return redirect(url_for("login"))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({"error": "Username and password required"}), 400
+
+        if users_collection.find_one({"username": username}):
+            return jsonify({"error": "Username already exists"}), 400
+
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        users_collection.insert_one({
+            "username": username,
+            "password": hashed_pw
+        })
+
+        session['username'] = username
+        return jsonify({"success": True})
+
+    return render_template('register.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        user = users_collection.find_one({"username": username})
+        if not user:
+            return jsonify({"error": "Invalid username or password"}), 401
+
+        if bcrypt.checkpw(password.encode('utf-8'), user['password']):
+            session['username'] = username
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "Invalid username or password"}), 401
+
     return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for("login"))
+
+
+@app.route('/getUser')
+def get_user():
+    return json.dumps(session['username'])
 
 
 @app.route('/home')
 def home():
+    if "username" not in session:
+        return redirect(url_for("login"))
     return render_template('home.html')
 
 
@@ -43,14 +101,12 @@ def home():
 def classes():
 
     if request.method == 'POST':
-        #temp username
-        session['username'] = 'admin'
         data = request.get_json()
         existing = notes_collection.find_one({
             "username": session['username'],
             "class": data
         })
-        print(existing)
+
         if existing is None:
             notes_collection.insert_one({
                 "username": session['username'],
@@ -62,7 +118,6 @@ def classes():
             return json.dumps("Class already exists")
 
     if request.method == 'GET':
-        session['username'] = 'admin'
 
         classes = notes_collection.find(
             {"username": session['username']},

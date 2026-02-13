@@ -1,112 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ note }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ note }}</title>
 
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
 
-<style>
-body {
-    margin: 0;
-    font-family: "Nerko One", cursive;
-    background: linear-gradient(135deg, #2f2f2f, #1e1e1e);
-    color: white;
-    display: flex;
-    justify-content: center;
-    padding: 40px 20px;
-}
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
-.container {
-    width: 100%;
-    max-width: 900px;
-}
+        body {
+            margin: 0;
+            font-family: "Nerko One", cursive;
+            background: linear-gradient(135deg, #2f2f2f, #1e1e1e);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-h1, h2 {
-    margin: 10px 0;
-}
+        header {
+            width: 100%;
+            background: #2a2a2a;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            padding: 0 30px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .logo {
+            font-size: 26px;
+            color: cornflowerblue;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: opacity 0.2s;
+        }
 
-button {
-    background: cornflowerblue;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 16px;
-    margin: 6px 0;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
+        .logo:hover { opacity: 0.8; }
+        .logo span { color: white; }
 
-button:hover {
-    background: white;
-    color: black;
-}
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
 
-#editor {
-    background: white;
-    color: black;
-    border-radius: 10px;
-    margin-top: 20px;
-}
+        .header-username {
+            font-size: 15px;
+            color: #ccc;
+        }
 
-.section {
-    margin-top: 30px;
-}
+        .header-username strong { color: white; }
 
-.quizAnswerChoice {
-    display: block;
-    width: 100%;
-    margin: 6px 0;
-    background: sandybrown;
-}
+        .header-link {
+            font-size: 15px;
+            color: cornflowerblue;
+            text-decoration: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: 0.2s ease-in-out;
+        }
 
-.correct { background: green !important; }
-.incorrect { background: crimson !important; }
+        .header-link:hover {
+            border-color: cornflowerblue;
+            color: white;
+        }
 
-</style>
+        .header-logout {
+            font-size: 15px;
+            color: #aaa;
+            text-decoration: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 2px solid #555;
+            transition: 0.2s ease-in-out;
+        }
+
+        .header-logout:hover {
+            border-color: #ff7f7f;
+            color: #ff7f7f;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-header-text h2 {
+            margin: 0 0 4px;
+            font-size: 18px;
+            color: #aaa;
+            font-weight: normal;
+        }
+
+        .page-header-text h1 {
+            margin: 0;
+            font-size: 34px;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: "Nerko One", cursive;
+            font-size: 15px;
+            color: white;
+            background: cornflowerblue;
+            border: none;
+            border-radius: 20px;
+            padding: 9px 18px;
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            background: white;
+            color: black;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-back {
+            background-color: #7a2a2a;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .btn-back:hover {
+            background-color: #ff7f7f;
+            color: black;
+        }
+
+        .btn-save {
+            background-color: darkolivegreen;
+        }
+
+        .btn-save:hover {
+            background-color: #a0c060;
+            color: black;
+        }
+
+        .btn-quiz {
+            background-color: #6a4fa0;
+        }
+
+        .btn-quiz:hover {
+            background-color: #c0a0ff;
+            color: black;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        #saveToast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: darkolivegreen;
+            color: white;
+            font-family: "Nerko One", cursive;
+            font-size: 15px;
+            padding: 10px 24px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            z-index: 300;
+        }
+
+        #saveToast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #editor {
+            background: white;
+            color: black;
+            border-radius: 10px;
+            margin-top: 4px;
+            min-height: 300px;
+        }
+
+        .ql-toolbar.ql-snow {
+            border-radius: 10px 10px 0 0;
+            border-color: #555 !important;
+        }
+
+        .ql-container.ql-snow {
+            border-radius: 0 0 10px 10px;
+            border-color: #555 !important;
+        }
+
+        .section {
+            margin-top: 35px;
+        }
+
+        .section h2 {
+            margin: 0 0 16px;
+            font-size: 22px;
+            color: #ccc;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+        }
+
+        .section h3 {
+            margin: 20px 0 10px;
+            font-size: 17px;
+        }
+
+        .quizAnswerChoice {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 6px 0;
+            padding: 10px 18px;
+            background: #7a6040;
+            text-align: left;
+            border-radius: 20px;
+            transition: 0.2s ease;
+        }
+
+        .quizAnswerChoice:hover {
+            background: #c0a060;
+            color: black;
+            transform: translateY(-2px);
+        }
+
+        .quizAnswerChoice.correct {
+            background: #2d7a2d !important;
+            color: white !important;
+            transform: none;
+            cursor: default;
+        }
+
+        .quizAnswerChoice.incorrect {
+            background: #8b0000 !important;
+            color: white !important;
+            transform: none;
+            cursor: default;
+        }
+
+        .quizAnswerChoice.answered {
+            pointer-events: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body>
-<div class="container">
 
-<div class="header">
-    <div>
-        <h2>{{ className }}</h2>
-        <h1>{{ note }}</h1>
+<header>
+    <a href="/home" class="logo">Quiz<span>Notes</span></a>
+    <div class="header-right">
+        <span class="header-username">Hey, <strong id="headerUsername">...</strong></span>
+        <a href="/home" class="header-link">Home</a>
+        <a href="/logout" class="header-logout">Log out</a>
     </div>
-    <button onclick="goBack()">← Back</button>
+</header>
+
+<div class="page">
+
+    <div class="page-header">
+        <div class="page-header-text">
+            <h2>{{ className }}</h2>
+            <h1>{{ note }}</h1>
+        </div>
+        <button class="btn-back" onclick="goBack()">← Back</button>
+    </div>
+
+    <div id="editor"></div>
+
+    <div class="action-bar">
+        <button class="btn-save" onclick="saveNote()">💾 Save</button>
+        <button class="btn-quiz" onclick="generateQuiz()">✨ Generate Quiz (AI)</button>
+    </div>
+
+    <div class="section" id="quizContents"></div>
+
 </div>
 
-<div id="editor"></div>
-
-<div class="section">
-    <button onclick="saveNote()">Save</button>
-    <button onclick="generateQuiz()">Generate Quiz (AI)</button>
-</div>
-
-<div class="section" id="quizContents"></div>
-
-</div>
+<div id="saveToast">Note saved!</div>
 
 <script>
 
 let quill;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    loadUser();
     quill = new Quill('#editor', { theme: 'snow' });
     await loadNote();
 });
 
 function goBack() {
     window.location.href = "/home";
+}
+
+async function loadUser() {
+    try {
+        const res = await fetch('/getUser');
+        const data = await res.json();
+        document.getElementById("headerUsername").textContent = data.username ?? data;
+    } catch (err) {
+        console.error("Failed to load user:", err);
+    }
 }
 
 async function loadNote() {
@@ -131,13 +361,23 @@ async function saveNote() {
             body: JSON.stringify(quill.getContents())
         });
 
-        alert("Saved!");
+        showToast();
     } catch (err) {
         console.error("Failed to save:", err);
     }
 }
 
+function showToast() {
+    const toast = document.getElementById("saveToast");
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2500);
+}
+
 async function generateQuiz() {
+    const btn = document.querySelector(".btn-quiz");
+    btn.textContent = "⏳ Generating...";
+    btn.disabled = true;
+
     try {
         const res = await fetch('/aiBot', {
             method: 'POST',
@@ -150,6 +390,9 @@ async function generateQuiz() {
 
     } catch (err) {
         console.error("Failed to generate quiz:", err);
+    } finally {
+        btn.textContent = "✨ Generate Quiz (AI)";
+        btn.disabled = false;
     }
 }
 
@@ -159,15 +402,16 @@ function renderQuiz(text) {
 
     if (!text) return;
 
-    // Extract title
     const titleMatch = text.match(/###(.*?)###/);
     if (titleMatch) {
+        const section = document.createElement("div");
+        section.className = "section fade-in";
         const h2 = document.createElement("h2");
-        h2.textContent = titleMatch[1];
-        container.appendChild(h2);
+        h2.textContent = titleMatch[1].trim();
+        section.appendChild(h2);
+        container.appendChild(section);
     }
 
-    // Extract questions
     const questionRegex = /\*\*(.*?)\*\*/g;
     const choiceRegex = /~~([a-d])~~([01])(.*?)(?=(~~[a-d]~~[01]|\*\*|\$\$\$))/gs;
 
@@ -177,25 +421,27 @@ function renderQuiz(text) {
         const qText = qMatch[1];
 
         const qHeader = document.createElement("h3");
-        qHeader.textContent = qText;
+        qHeader.textContent = `${index + 1}. ${qText}`;
         container.appendChild(qHeader);
 
-        let choicesStart = qMatch.index + qMatch[0].length;
-        let nextQuestionIndex = (questions[index+1]) ? questions[index+1].index : text.length;
-        let choicesBlock = text.slice(choicesStart, nextQuestionIndex);
-
-        let choices = [...choicesBlock.matchAll(choiceRegex)];
+        const choicesStart = qMatch.index + qMatch[0].length;
+        const nextQuestionIndex = questions[index + 1] ? questions[index + 1].index : text.length;
+        const choicesBlock = text.slice(choicesStart, nextQuestionIndex);
+        const choices = [...choicesBlock.matchAll(choiceRegex)];
 
         choices.forEach(choice => {
-            const letter = choice[1];
+            const letter  = choice[1];
             const correct = choice[2] === "1";
-            const label = choice[3].trim();
+            const label   = choice[3].trim();
 
             const btn = document.createElement("button");
-            btn.className = "quizAnswerChoice";
+            btn.className = "quizAnswerChoice fade-in";
             btn.textContent = `${letter.toUpperCase()}: ${label}`;
 
             btn.onclick = () => {
+                btn.closest("div")?.querySelectorAll(".quizAnswerChoice").forEach(b => {
+                    b.classList.add("answered");
+                });
                 btn.classList.add(correct ? "correct" : "incorrect");
             };
 

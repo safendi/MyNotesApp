@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
 
@@ -75,6 +75,10 @@
             background: #222;
         }
 
+        input.error {
+            border-color: #ff7f7f;
+        }
+
         button {
             background-color: cornflowerblue;
             border: none;
@@ -106,6 +110,10 @@
             min-height: 20px;
         }
 
+        #message.success {
+            color: #7fbf7f;
+        }
+
         .divider {
             margin: 20px 0 16px;
             display: flex;
@@ -123,18 +131,18 @@
             background: #555;
         }
 
-        .signup-link {
+        .login-link {
             font-size: 14px;
             color: #aaa;
         }
 
-        .signup-link a {
+        .login-link a {
             color: cornflowerblue;
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        .signup-link a:hover {
+        .login-link a:hover {
             color: white;
         }
 
@@ -147,50 +155,71 @@
 <body>
 
 <div class="container">
-    <h1>Welcome Back</h1>
+    <h1>Create Account</h1>
 
     <div class="input-group">
         <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Enter your username">
+        <input type="text" id="username" placeholder="Choose a username">
     </div>
 
     <div class="input-group">
         <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password">
+        <input type="password" id="password" placeholder="Choose a password">
     </div>
 
-    <button onclick="loginUser()">Login</button>
+    <div class="input-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="Re-enter your password">
+    </div>
+
+    <button onclick="registerUser()">Register</button>
 
     <p id="message"></p>
 
     <div class="divider">or</div>
 
-    <p class="signup-link">Don't have an account? <a href="/register">Sign up</a></p>
+    <p class="login-link">Already have an account? <a href="/login">Log in</a></p>
 </div>
 
 <script>
-
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") loginUser();
+        if (e.key === "Enter") registerUser();
     });
 
-    async function loginUser() {
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value;
-        const message  = document.getElementById("message");
+    async function registerUser() {
+        const username        = document.getElementById("username");
+        const password        = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirmPassword");
+        const message         = document.getElementById("message");
 
-        if (!username || !password) {
-            message.innerText = "Please fill in both fields.";
+        [username, password, confirmPassword].forEach(el => el.classList.remove("error"));
+        message.className = "";
+        message.innerText = "";
+
+        if (!username.value.trim()) {
+            message.innerText = "Please enter a username.";
+            username.classList.add("error");
             return;
         }
 
-        message.innerText = "";
+        if (!password.value) {
+            message.innerText = "Please enter a password.";
+            password.classList.add("error");
+            return;
+        }
+
+        if (password.value !== confirmPassword.value) {
+            message.innerText = "Passwords don't match.";
+            password.classList.add("error");
+            confirmPassword.classList.add("error");
+            return;
+        }
 
         try {
-            const res = await fetch("/login", {
+            const res = await fetch("/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username: username.value.trim(), password: password.value })
             });
 
             const data = await res.json();
@@ -198,11 +227,11 @@
             if (res.ok) {
                 window.location.href = "/home";
             } else {
-                message.innerText = data.error || "Login failed. Please try again.";
+                message.innerText = data.error || "Registration failed. Please try again.";
             }
         } catch (err) {
             message.innerText = "Something went wrong. Please try again.";
-            console.error("Login error:", err);
+            console.error("Register error:", err);
         }
     }
 </script>

@@ -1,129 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ className }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ className }}</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nerko+One&display=swap" rel="stylesheet">
 
-<style>
-body {
-    margin: 0;
-    font-family: "Nerko One", cursive;
-    background: linear-gradient(135deg, #2f2f2f, #1e1e1e);
-    color: white;
-    display: flex;
-    justify-content: center;
-    padding: 40px 20px;
-}
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
-.container {
-    width: 100%;
-    max-width: 600px;
-}
+        body {
+            margin: 0;
+            font-family: "Nerko One", cursive;
+            background: linear-gradient(135deg, #2f2f2f, #1e1e1e);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        /* ── Header ── */
+        header {
+            width: 100%;
+            background: #2a2a2a;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            padding: 0 30px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-button {
-    cursor: pointer;
-    background-color: cornflowerblue;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 16px;
-    margin: 6px 0;
-    transition: 0.2s ease;
-}
+        .logo {
+            font-size: 26px;
+            color: cornflowerblue;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: opacity 0.2s;
+        }
 
-button:hover {
-    background-color: white;
-    color: black;
-}
+        .logo:hover { opacity: 0.8; }
 
-.note-button {
-    display: block;
-    width: 100%;
-    margin-top: 8px;
-}
+        .logo span { color: white; }
 
-.section {
-    margin-top: 30px;
-}
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
 
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
+        .header-username {
+            font-size: 15px;
+            color: #ccc;
+        }
 
-.modal {
-    background: #3a3a3a;
-    padding: 25px;
-    border-radius: 15px;
-    width: 300px;
-    text-align: center;
-}
+        .header-username strong { color: white; }
 
-input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 15px;
-    border: none;
-    margin-bottom: 10px;
-    text-align: center;
-}
+        .header-link {
+            font-size: 15px;
+            color: cornflowerblue;
+            text-decoration: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: 0.2s ease-in-out;
+        }
 
-.hidden {
-    display: none;
-}
+        .header-link:hover {
+            border-color: cornflowerblue;
+            color: white;
+        }
 
-</style>
+        .header-logout {
+            font-size: 15px;
+            color: #aaa;
+            text-decoration: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 2px solid #555;
+            transition: 0.2s ease-in-out;
+        }
+
+        .header-logout:hover {
+            border-color: #ff7f7f;
+            color: #ff7f7f;
+        }
+
+        /* ── Page content ── */
+        .page {
+            width: 100%;
+            max-width: 600px;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        /* ── Page header row ── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        /* ── Buttons ── */
+        button {
+            cursor: pointer;
+            font-family: "Nerko One", cursive;
+            font-size: 15px;
+            color: white;
+            background-color: cornflowerblue;
+            border: none;
+            border-radius: 20px;
+            padding: 9px 18px;
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            background-color: white;
+            color: black;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-back {
+            background-color: #7a2a2a;
+            font-size: 14px;
+        }
+
+        .btn-back:hover {
+            background-color: #ff7f7f;
+            color: black;
+        }
+
+        .btn-new-note {
+            background-color: darkolivegreen;
+            margin-top: 4px;
+        }
+
+        .btn-new-note:hover {
+            background-color: #a0c060;
+            color: black;
+        }
+
+        /* ── Hint text ── */
+        .hint {
+            font-size: 13px;
+            color: #888;
+            margin: 6px 0 0 4px;
+            font-style: italic;
+        }
+
+        /* ── Section ── */
+        .section {
+            margin-top: 35px;
+        }
+
+        .section h3 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            color: #ccc;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+        }
+
+        /* ── Note buttons ── */
+        .note-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px 18px;
+            text-align: left;
+            background-color: cornflowerblue;
+            border-radius: 20px;
+        }
+
+        .note-button .arrow {
+            font-size: 18px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .note-button:hover .arrow { opacity: 1; }
+
+        /* ── Empty state ── */
+        .empty-state {
+            color: #888;
+            font-size: 15px;
+            margin-top: 12px;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            animation: fadeIn 0.2s ease-in;
+        }
+
+        .modal {
+            background: #3a3a3a;
+            padding: 30px 25px;
+            border-radius: 20px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal h3 {
+            margin: 0 0 18px;
+            font-size: 22px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            background: #2a2a2a;
+            color: white;
+            font-family: "Nerko One", cursive;
+            font-size: 15px;
+            outline: none;
+            text-align: center;
+            margin-bottom: 14px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        input::placeholder { color: #777; }
+
+        input:focus {
+            border-color: cornflowerblue;
+            background: #222;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .btn-cancel {
+            background-color: #6a2a2a;
+        }
+
+        .btn-cancel:hover {
+            background-color: #ff7f7f;
+            color: black;
+        }
+
+        /* ── Animations ── */
+        .hidden { display: none; }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body>
-<div class="container">
 
-<div class="header">
-    <h1>{{ className }}</h1>
-    <button onclick="goBack()" style="background-color: darkred;">← Back</button>
+<!-- ── Header ── -->
+<header>
+    <a href="/home" class="logo">Quiz<span>Notes</span></a>
+    <div class="header-right">
+        <span class="header-username">Hey, <strong id="headerUsername">...</strong></span>
+        <a href="/home" class="header-link">Home</a>
+        <a href="/logout" class="header-logout">Log out</a>
+    </div>
+</header>
+
+<!-- ── Page ── -->
+<div class="page">
+
+    <div class="page-header">
+        <h1>{{ className }}</h1>
+        <button class="btn-back" onclick="goBack()">← Back</button>
+    </div>
+
+    <div class="section">
+        <button class="btn-new-note" onclick="openModal()">+ New Note</button>
+        <p class="hint">e.g. Day 1, Lesson 1, Photosynthesis</p>
+    </div>
+
+    <div class="section">
+        <h3>My Notes</h3>
+        <p id="noNotes" class="empty-state hidden">No notes yet — create one above!</p>
+        <div id="notesList"></div>
+    </div>
+
 </div>
 
-<div class="section">
-    <button onclick="openModal()" style="background-color: darkolivegreen;">+ New Note</button>
-    <p><i>ex: Day 1, Lesson 1, Photosynthesis</i></p>
-</div>
-
-<div class="section">
-    <h3>My Notes</h3>
-    <h2 id="noNotes" class="hidden">No notes currently</h2>
-    <div id="notesList"></div>
-</div>
-
-</div>
-
-<!-- Modal -->
+<!-- ── Modal ── -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <h3>Name Your Note</h3>
         <input type="text" id="newNoteName" placeholder="Enter note name">
-        <button onclick="createNote()">Create</button>
-        <button onclick="closeModal()" style="background-color: darkred;">Cancel</button>
+        <div class="modal-actions">
+            <button onclick="createNote()">Create</button>
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        </div>
     </div>
 </div>
 
 <script>
 
-document.addEventListener("DOMContentLoaded", loadClassData);
+document.addEventListener("DOMContentLoaded", () => {
+    loadUser();
+    loadClassData();
+
+    document.getElementById("newNoteName").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") createNote();
+        if (e.key === "Escape") closeModal();
+    });
+});
 
 function goBack() {
     window.location.href = "/home";
+}
+
+async function loadUser() {
+    try {
+        const res = await fetch('/getUser');
+        const data = await res.json();
+        document.getElementById("headerUsername").textContent = data.username ?? data;
+    } catch (err) {
+        console.error("Failed to load user:", err);
+    }
 }
 
 async function loadClassData() {
@@ -144,11 +375,9 @@ async function loadClassData() {
 
         Object.keys(data).forEach(note => {
             const btn = document.createElement("button");
-            btn.textContent = note;
-            btn.className = "note-button";
-
+            btn.className = "note-button fade-in";
+            btn.innerHTML = `<span>${note}</span><span class="arrow">›</span>`;
             btn.addEventListener("click", () => openNote(note));
-
             list.appendChild(btn);
         });
 
@@ -174,7 +403,9 @@ async function openNote(note) {
 }
 
 function openModal() {
-    document.getElementById("modalOverlay").style.display = "flex";
+    const overlay = document.getElementById("modalOverlay");
+    overlay.style.display = "flex";
+    setTimeout(() => document.getElementById("newNoteName").focus(), 50);
 }
 
 function closeModal() {
@@ -183,10 +414,12 @@ function closeModal() {
 }
 
 async function createNote() {
-    const name = document.getElementById("newNoteName").value.trim();
+    const input = document.getElementById("newNoteName");
+    const name = input.value.trim();
 
     if (!name) {
-        alert("Please enter a note name.");
+        input.style.borderColor = "#ff7f7f";
+        setTimeout(() => input.style.borderColor = "", 1200);
         return;
     }
 
@@ -198,7 +431,7 @@ async function createNote() {
         });
 
         closeModal();
-        loadClassData(); // Refresh without reload
+        loadClassData();
 
     } catch (err) {
         console.error("Failed to create note:", err);
