@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.11-slim
 
 ENV HOME /root
 WORKDIR /root
@@ -15,4 +15,4 @@ EXPOSE 8080
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
 RUN chmod +x /wait
 
-CMD /wait && python3 -u app.py
+CMD /wait && gunicorn --workers 3 --bind 0.0.0.0:8080 app:app
